@@ -22,10 +22,51 @@
 #include "watchdog.h"
 #include "general.h"
 
+// 1ms
+#define CANARI_PERIOD 1000000
+// 1 sec
+#define WATCHDOG_PERIOD (CANARI_PERIOD * 1000)
 
-void(*watchdog_suspend_function)(void)=NULL; /**< Fonction appelée lors d'une surcharge */
+typedef unsigned long CPT_TYPE;
 
+static void(*watchdog_suspend_function)(void)=NULL; /**< Fonction appelée lors d'une surcharge */
+static char stop_watchdog = 0;
+static CPT_TYPE canari_cpt = 0;
+static RT_TASK task_canari;
+static RT_TASK task_watchdog;
 
+/** \brief Tache du canary
+* 
+*/
+static void task_canari_fct(void *data) {
+    RTIME time = CANARI_PERIOD;
+
+    rt_task_set_periodic(rt_task_self(), TM_NOW, time);
+
+    // Effectue dit cui cui souvant
+    while (0 == rt_task_wait_period(NULL) && stop_watchdog == 0) {
+         canari_cpt += 1; // Cui cui
+    }
+}
+
+/**
+*
+*/
+static void task_watchdog_fct(void *data) {
+    RTIME max_freez = WATCHDOG_PERIOD;
+    
+    rt_task_set_periodic(rt_task_self(), TM_NOW, max_freez);
+    CPT_TYPE last_canari_cpt = canari_cpt;
+
+    // Vérifie que le canari dit cui cui suffisament souvant
+    while (0 == rt_task_wait_period(NULL) && stop_watchdog == 0) {
+        if (last_canari_cpt == canari_cpt) {
+            if (watchdog_suspend_function) 
+                watchdog_suspend_function();
+            stop_watchdog = 1;
+        }
+    }
+}
 
 /** \brief Démarre le watchdog
 *
@@ -38,9 +79,19 @@ void(*watchdog_suspend_function)(void)=NULL; /**< Fonction appelée lors d'une s
 */
 int start_watchdog(void(* suspend_func)(void))
 {
-  watchdog_suspend_function=suspend_func;
+    watchdog_suspend_function=suspend_func;
+    int error;
+    
+    if ((error = rt_task_spawn(&task_canari, "Canari task", 0, 0, T_JOINABLE, task_canari_fct, NULL)) != 0) {
+        rt_fprintf(stderr, "error: cannot create the canari task (%s)\n", strerror(-error));
+        return -1;
+    }
 
-  return 1;
+    if ((error = rt_task_spawn(&task_watchdog, "Watchdog task", 0, 0, T_JOINABLE, task_watchdog_fct, NULL)) != 0) {
+        rt_fprintf(stderr, "error: cannot create the watchdog task (%s)\n", strerror(-error));
+        return -1;
+    }
+    return 0;
 }
 
 
@@ -54,7 +105,16 @@ int start_watchdog(void(* suspend_func)(void))
 */
 int end_watchdog(void)
 {
-
-  return 1;
+    stop_watchdog = 1;
+    int result;
+    if (0 != (result = rt_task_join(&task_canari))) {
+        rt_fprintf(stderr, "Impossible de joindre la tache canari err : %s", strerror(-result));
+        return -1;
+    }
+    if (0 != (result = rt_task_join(&task_watchdog))) {
+        rt_fprintf(stderr, "Impossible de joindre la tache canari err : %s", strerror(-result));
+        return -1;
+    }
+    return 0;
 }
 
