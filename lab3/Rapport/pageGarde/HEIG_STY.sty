@@ -1,0 +1,30 @@
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{HEIG_STY}[2014/10/27 beta]
+
+
+\RequirePackage{titling} % For use with Title Page
+\RequirePackage{graphicx}
+
+% New fields relative to assignement
+\newcommand{\@institution}{}
+\newcommand{\institution}[1]{\renewcommand{\@institution}{#1}}
+\newcommand{\theInstitution}{\@institution}
+
+\newcommand{\@cours}{}
+\newcommand{\cours}[1]{\renewcommand{\@cours}{#1}}
+\newcommand{\theCours}{\@cours}
+
+\newcommand{\@acro}{}
+\newcommand{\acro}[1]{\renewcommand{\@acro}{#1}}
+\newcommand{\theAcro}{\@acro}
+
+\newcommand{\@prof}{}
+\newcommand{\prof}[1]{\renewcommand{\@prof}{#1}}
+\newcommand{\theProf}{\@prof}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
+
+\renewcommand{\maketitle}{\input{pageGarde/HEIG_titlepage}}
+
+
+\endinput

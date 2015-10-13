@@ -1,0 +1,185 @@
+% Compiler ce document 
+
+% package de base
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+
+% langues
+\usepackage[francais]{babel}
+\usepackage[french]{datetime}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+
+% liens
+\usepackage[hidelinks]{hyperref}
+
+% Page de Garde -- Necessite d'installer le package titling, si probleme
+% commenter la ligne suivante ainsi que les infos necessaires a la page
+% de garde
+\usepackage{pageGarde/HEIG_STY}
+
+% En tetes / bas de page
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhfoffset[re]{4cm}
+
+% Pour le listing de code
+\usepackage{listings}
+
+%Pour le landscape
+\usepackage{lscape}
+
+%marge des pages
+\setlength{\textwidth}{16cm}
+\setlength{\textheight}{24cm}
+\setlength{\oddsidemargin}{0cm}
+\setlength{\voffset}{-1.5cm}
+\setlength{\headheight}{15pt}
+
+%% Sans-serif Arial-like fonts
+\renewcommand{\rmdefault}{phv} 
+\renewcommand{\sfdefault}{phv} 
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{eurosym}
+\usepackage{xspace}
+\newcommand{\projectname}[0]{LTANR\xspace} 
+\newcommand{\tab}[1]{\hspace{.2\textwidth}\rlap{#1}}
+
+%No indent for the first line
+\setlength{\parindent}{0cm}
+
+% IFor code include
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{xargs}
+\usepackage{xifthen}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=L,
+  xleftmargin=\parindent,
+  language=C,
+  numbers=left,
+  numbersep=8pt,
+  stepnumber=1,
+  numberstyle=\tiny\color{gray},
+  showstringspaces=false,
+  tabsize=4,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\bfseries\color{green!40!black},
+  commentstyle=\itshape\color{purple!40!black},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+}
+
+\lstdefinestyle{customcpp}{
+   belowcaptionskip=1\baselineskip,
+   breaklines=true,
+   frame=L,
+   xleftmargin=\parindent,
+   language=C++,
+   showstringspaces=false,
+   basicstyle=\footnotesize\ttfamily,
+   keywordstyle=\color{blue},
+   commentstyle=\itshape\color{green},
+   stringstyle=\color{purple},
+   identifierstyle=\color{gray},
+   tabsize=4,
+   numbers=left,
+   numbersep=8pt,
+   stepnumber=1,
+   numberstyle=\tiny\color{gray},
+}
+
+\newcommandx{\includecode}[3][1=, 2=c]{
+	\ifthenelse{\equal{#1}{}}
+	    {\lstinputlisting[caption=#3, escapechar=, style=custom#2]{#3}}
+	    {\lstinputlisting[caption=#1, escapechar=, style=custom#2]{#3}}
+}
+
+
+
+%parametters
+\author{Loïc Haas}
+\title{Laboratoire 03}
+
+% Informations necessaires a la page de garde
+% Commenter si probleme de compilation
+\acro{PTR}
+%\prof{Yann Thoma}
+\date{\today}
+
+%en-tête
+\lhead{}
+\chead{}
+\rhead{}
+
+%pied-de-page
+\lfoot{\today}
+\cfoot{HEIG-VD}
+\rfoot{page \thepage}
+
+
+\begin{document}
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+
+\section{Introduction}
+Le but principal du laboratoire est de se familiariser avec les taches Xenomai et de comparer la précision des tache periodiques entre \textsc{Pthread} et \textsc{Xenomai} lorsque le system est surchargé. Toutes les mesures effectuée dans ce laboratoire sont sur un seul cœur CPU avec l'application \textit{dohell} exécutée simultanément.
+
+\section{Résultats}
+\subsection{Pthread}
+Voici les résultat de l'intervalle entre deux exécutions de la tache periodique que l'on obtiens avec le code page \pageref{codePthread} pour 10000 mesures avec un intervalle d'une milliseconde les valeurs sont donné en nanosecondes.\\
+\begin{verbatim}
+  Total of 10000 values 
+    Minimum  = 1005730.000000 (position = 6750) 
+    Maximum  = 383418316.000000 (position = 2049) 
+    Sum      = 10890408840.000000 
+    Mean     = 1089040.884000
+    Variance = 14619504619410.791016 
+    Std Dev  = 3823546.079154 
+    CoV      = 3.510930
+\end{verbatim}
+
+\subsection{Xenomai}
+Voici les résultat de l'intervalle entre deux exécutions de la tache periodique que l'on obtiens avec le code page \pageref{codeXenomai} pour 10000 mesures avec un intervalle d'une milliseconde les valeurs sont donné en nanosecondes.\\
+\begin{verbatim}
+  Total of 10000 values 
+    Minimum  = 992747.000000 (position = 5609) 
+    Maximum  = 1007146.000000 (position = 5608) 
+    Sum      = 9999999385.000000 
+    Mean     = 999999.938500 
+    Variance = 247435.016846 
+    Std Dev  = 497.428404 
+    CoV      = 0.000497
+\end{verbatim}
+\subsection{Comparaison des résultats}
+On vois bien que l’écart type d'une tache \textsc{Xenomai} ($0.497\mu s$) est bien plus petit que celui d'une tache \textsc{Pthread} ($3.824ms$) avec un rapport de 7000 on se rend bien compte que les taches \textsc{Xenomai} ne sont presques pas perturbée par les application s’exécutant dans le user space.
+
+\newpage
+\section{Code}
+\subsection{Pthread}
+\label{codePthread}
+\begin{scriptsize}
+\includecode[\detokenize{pthread_timer.c}]{../Sources/pthread_timer/pthread_timer.c}
+\end{scriptsize}
+
+%\newpage
+\subsection{Xenomai}
+\label{codeXenomai}
+\begin{scriptsize}
+\includecode[\detokenize{xenomai_timer.c}]{../Sources/xenomai_timer/xenomai_timer.c}
+\end{scriptsize}
+
+\end{document}
