@@ -65,7 +65,7 @@ static void task_watchdog_fct(void *data) {
             rt_printf("Watchdog : Arret du programme");
             if (watchdog_suspend_function) 
                 watchdog_suspend_function();
-            stop_watchdog = 1;
+            //stop_watchdog = 1;
         }
         last_canari_cpt = canari_cpt;
     }
