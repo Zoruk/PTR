@@ -86,12 +86,12 @@ int start_watchdog(void(* suspend_func)(void))
     int error;
     
     if ((error = rt_task_spawn(&task_canari, "Canari task", 0, 0, T_JOINABLE, task_canari_fct, NULL)) != 0) {
-        rt_fprintf(stderr, "error: cannot create the canari task (%s)\n", strerror(-error));
+        rt_printf("error: cannot create the canari task (%s)\n", strerror(-error));
         return -1;
     }
 
     if ((error = rt_task_spawn(&task_watchdog, "Watchdog task", 0, 99, T_JOINABLE, task_watchdog_fct, NULL)) != 0) {
-        rt_fprintf(stderr, "error: cannot create the watchdog task (%s)\n", strerror(-error));
+        rt_printf("error: cannot create the watchdog task (%s)\n", strerror(-error));
         return -1;
     }
     return 0;
