@@ -36,8 +36,8 @@
 #define PERIOD_TASK3       4000        /**< Période de la tâche 3 */
 
 #define CPU_TASK1          50          /**< Temps de traitement de la tâche 1 */
-#define CPU_TASK2          100         /**< Temps de traitement de la tâche 2 */
-#define CPU_TASK3          100         /**< Temps de traitement de la tâche 3 */
+#define CPU_TASK2          200         /**< Temps de traitement de la tâche 2 */
+#define CPU_TASK3          1000         /**< Temps de traitement de la tâche 3 */
 
 #define PRIO_TASK1         10          /**< Priorité de la tâche 1=faible, 99=forte */
 #define PRIO_TASK2         15          /**< Priorité de la tâche 1=faible, 99=forte */
