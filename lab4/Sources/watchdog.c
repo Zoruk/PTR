@@ -87,7 +87,7 @@ int start_watchdog(void(* suspend_func)(void))
         return -1;
     }
 
-    if ((error = rt_task_spawn(&task_watchdog, "Watchdog task", 0, 0, T_JOINABLE, task_watchdog_fct, NULL)) != 0) {
+    if ((error = rt_task_spawn(&task_watchdog, "Watchdog task", 0, 99, T_JOINABLE, task_watchdog_fct, NULL)) != 0) {
         rt_fprintf(stderr, "error: cannot create the watchdog task (%s)\n", strerror(-error));
         return -1;
     }
