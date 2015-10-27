@@ -24,8 +24,8 @@
 
 // 1ms
 #define CANARI_PERIOD 1000000
-// 1 sec
-#define WATCHDOG_PERIOD (CANARI_PERIOD * 1000)
+// 3 sec
+#define WATCHDOG_PERIOD (CANARI_PERIOD * 3000)
 
 typedef unsigned long CPT_TYPE;
 
@@ -61,6 +61,7 @@ static void task_watchdog_fct(void *data) {
     // Vérifie que le canari dit cui cui suffisament souvant
     while (0 == rt_task_wait_period(NULL) && stop_watchdog == 0) {
         if (last_canari_cpt == canari_cpt) {
+            rt_fprintf(stderr, "Watchdog : Arret du programme");
             if (watchdog_suspend_function) 
                 watchdog_suspend_function();
             stop_watchdog = 1;
