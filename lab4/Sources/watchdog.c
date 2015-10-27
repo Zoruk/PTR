@@ -60,6 +60,7 @@ static void task_watchdog_fct(void *data) {
 
     // Vérifie que le canari dit cui cui suffisament souvant
     while (0 == rt_task_wait_period(NULL) && stop_watchdog == 0) {
+        rt_printf("Watchdod: check canarycpt = %ul, last = %ul", canari_cpt, last_canari_cpt);
         if (last_canari_cpt == canari_cpt) {
             rt_printf("Watchdog : Arret du programme");
             if (watchdog_suspend_function) 

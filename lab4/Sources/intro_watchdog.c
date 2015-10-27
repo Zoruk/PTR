@@ -250,11 +250,9 @@ int main(int argc, char* argv[]) {
     printf("Error timer: %s\n", strerror(-err));
     return -1;
   }
-  
-  /*
+
   if (!start_watchdog(suspendre))
     goto fail;
-  */
 
 
   /* Création de la tâche périodique 1 */
