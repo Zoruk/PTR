@@ -36,8 +36,12 @@
 #define PERIOD_TASK3       4000        /**< Période de la tâche 3 */
 
 #define CPU_TASK1          50          /**< Temps de traitement de la tâche 1 */
-#define CPU_TASK2          200         /**< Temps de traitement de la tâche 2 */
-#define CPU_TASK3          1000         /**< Temps de traitement de la tâche 3 */
+#define CPU_TASK2          100         /**< Temps de traitement de la tâche 2 */
+#define CPU_TASK3          100         /**< Temps de traitement de la tâche 3 */
+
+#define CPU_TASK1_INC      10          /**< Temps de traitement ajouté à chaques iteration de la tâche 1 */
+#define CPU_TASK2_INC      20          /**< Temps de traitement ajouté à chaques iteration de la tâche 2 */
+#define CPU_TASK3_INC      100         /**< Temps de traitement ajouté à chaques iteration de la tâche 3 */
 
 #define PRIO_TASK1         10          /**< Priorité de la tâche 1=faible, 99=forte */
 #define PRIO_TASK2         15          /**< Priorité de la tâche 1=faible, 99=forte */
@@ -109,11 +113,12 @@ void periodicTask1(void *cookie) {
 
   rt_printf("Demarrage de la tache periodique 1\n", TM_NOW);
 
+  int i = 0;
   while (1) {
     
     /* simulation traitement */
     rt_printf("Tache periodique 1: debut d'execution\n");
-    busy_cpu(CPU_TASK1);
+    busy_cpu(CPU_TASK1 + CPU_TASK1_INC * i++);
     rt_printf("Tache periodique 1: fin d'execution\n");
 
     rt_task_wait_period(NULL);
@@ -151,12 +156,12 @@ void periodicTask2(void *cookie) {
   }
 
   rt_printf("Demarrage de la tache periodique 2\n", TM_NOW);
-
+  int i = 0;
   while (1) {
     
     /* simulation traitement */
     rt_printf("Tache periodique 2: debut d'execution\n");
-    busy_cpu(CPU_TASK2);
+    busy_cpu(CPU_TASK2 + CPU_TASK2_INC * i++);
     rt_printf("Tache periodique 2: fin d'execution\n");
 
     rt_task_wait_period(NULL);
@@ -193,11 +198,12 @@ void periodicTask3(void *cookie) {
 
   rt_printf("Demarrage de la tache periodique 3\n", TM_NOW);
 
+  int i = 0;
   while (1) {
     
     /* simulation traitement */
     rt_printf("Tache periodique 3: debut d'execution\n");
-    busy_cpu(CPU_TASK3);
+    busy_cpu(CPU_TASK3 + CPU_TASK3_INC * i++);
     rt_printf("Tache periodique 3: fin d'execution\n");
 
     rt_task_wait_period(NULL);
@@ -292,7 +298,6 @@ int main(int argc, char* argv[]) {
   return 0;
   
   fail:
-   printf("Faill");
    cleanup_objects();
    return -1;
 }
