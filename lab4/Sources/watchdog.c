@@ -24,8 +24,8 @@
 
 // 1ms
 #define CANARI_PERIOD 1000000
-// 3 sec
-#define WATCHDOG_PERIOD (CANARI_PERIOD * 3000ll)
+// 2 sec
+#define WATCHDOG_PERIOD (CANARI_PERIOD * 2000ll)
 
 typedef unsigned long CPT_TYPE;
 
