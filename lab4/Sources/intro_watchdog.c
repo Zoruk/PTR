@@ -32,7 +32,7 @@
 
 
 #define PERIOD_TASK1       1000        /**< Période de la tâche 1 */
-#define PERIOD_TASK2       200         /**< Période de la tâche 2 */
+#define PERIOD_TASK2       2000        /**< Période de la tâche 2 */
 #define PERIOD_TASK3       4000        /**< Période de la tâche 3 */
 
 #define CPU_TASK1          50          /**< Temps de traitement de la tâche 1 */
