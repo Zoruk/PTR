@@ -44,8 +44,9 @@ static void task_canari_fct(void *data) {
     rt_task_set_periodic(rt_task_self(), TM_NOW, time);
 
     // Effectue dit cui cui souvant
-    while (0 == rt_task_wait_period(NULL) && stop_watchdog == 0) {
+    while (stop_watchdog == 0) {
          canari_cpt += 1; // Cui cui
+         rt_task_wait_period(NULL);
     }
 }
 
@@ -60,7 +61,7 @@ static void task_watchdog_fct(void *data) {
 
     // Vérifie que le canari dit cui cui suffisament souvant
     while (0 == rt_task_wait_period(NULL) && stop_watchdog == 0) {
-        rt_printf("Watchdod: check canarycpt = %ul, last = %ul\n", canari_cpt, last_canari_cpt);
+        rt_printf("Watchdod: check canarycpt = %u, last = %u\n", canari_cpt, last_canari_cpt);
         if (last_canari_cpt == canari_cpt) {
             rt_printf("Watchdog : Arret du programme\n");
             if (watchdog_suspend_function) 
