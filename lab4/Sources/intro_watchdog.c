@@ -251,7 +251,7 @@ int main(int argc, char* argv[]) {
     return -1;
   }
 
-  if (!start_watchdog(suspendre))
+  if (start_watchdog(suspendre))
     goto fail;
 
 

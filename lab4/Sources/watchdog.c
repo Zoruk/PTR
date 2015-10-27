@@ -83,14 +83,15 @@ static void task_watchdog_fct(void *data) {
 int start_watchdog(void(* suspend_func)(void))
 {
     watchdog_suspend_function=suspend_func;
+    stop_watchdog = 0;
     int error;
     
-    if ((error = rt_task_spawn(&task_canari, "Canari task", 0, 0, T_JOINABLE, task_canari_fct, NULL)) != 0) {
+    if ((error = rt_task_spawn(&task_canari, "Canari task", 0, 0, 0, task_canari_fct, NULL)) != 0) {
         rt_printf("error: cannot create the canari task (%s)\n", strerror(-error));
         return -1;
     }
 
-    if ((error = rt_task_spawn(&task_watchdog, "Watchdog task", 0, 99, T_JOINABLE, task_watchdog_fct, NULL)) != 0) {
+    if ((error = rt_task_spawn(&task_watchdog, "Watchdog task", 0, 99, 0, task_watchdog_fct, NULL)) != 0) {
         rt_printf("error: cannot create the watchdog task (%s)\n", strerror(-error));
         return -1;
     }
@@ -110,12 +111,12 @@ int end_watchdog(void)
 {
     stop_watchdog = 1;
     int result;
-    if (0 != (result = rt_task_join(&task_canari))) {
-        rt_fprintf(stderr, "Impossible de joindre la tache canari err : %s", strerror(-result));
+    if (0 != (result = rt_task_delete(&task_canari))) {
+        rt_fprintf(stderr, "Impossible de delete la tache canari err : %s", strerror(-result));
         return -1;
     }
-    if (0 != (result = rt_task_join(&task_watchdog))) {
-        rt_fprintf(stderr, "Impossible de joindre la tache canari err : %s", strerror(-result));
+    if (0 != (result = rt_task_delete(&task_watchdog))) {
+        rt_fprintf(stderr, "Impossible de delete la tache canari err : %s", strerror(-result));
         return -1;
     }
     return 0;
