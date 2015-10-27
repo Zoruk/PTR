@@ -56,7 +56,7 @@ static void task_watchdog_fct(void *data) {
     RTIME max_freez = WATCHDOG_PERIOD;
     
     rt_task_set_periodic(rt_task_self(), TM_NOW, max_freez);
-    CPT_TYPE last_canari_cpt = canari_cpt;
+    CPT_TYPE last_canari_cpt = -1;
 
     // Vérifie que le canari dit cui cui suffisament souvant
     while (0 == rt_task_wait_period(NULL) && stop_watchdog == 0) {
@@ -67,6 +67,7 @@ static void task_watchdog_fct(void *data) {
                 watchdog_suspend_function();
             stop_watchdog = 1;
         }
+        last_canari_cpt = canari_cpt;
     }
 }
 
