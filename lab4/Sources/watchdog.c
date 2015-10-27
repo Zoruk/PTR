@@ -60,9 +60,9 @@ static void task_watchdog_fct(void *data) {
 
     // Vérifie que le canari dit cui cui suffisament souvant
     while (0 == rt_task_wait_period(NULL) && stop_watchdog == 0) {
-        rt_printf("Watchdod: check canarycpt = %ul, last = %ul", canari_cpt, last_canari_cpt);
+        rt_printf("Watchdod: check canarycpt = %ul, last = %ul\n", canari_cpt, last_canari_cpt);
         if (last_canari_cpt == canari_cpt) {
-            rt_printf("Watchdog : Arret du programme");
+            rt_printf("Watchdog : Arret du programme\n");
             if (watchdog_suspend_function) 
                 watchdog_suspend_function();
             //stop_watchdog = 1;
@@ -112,11 +112,11 @@ int end_watchdog(void)
     stop_watchdog = 1;
     int result;
     if (0 != (result = rt_task_delete(&task_canari))) {
-        rt_fprintf(stderr, "Impossible de delete la tache canari err : %s", strerror(-result));
+        rt_fprintf(stderr, "Impossible de delete la tache canari err : %s\n", strerror(-result));
         return -1;
     }
     if (0 != (result = rt_task_delete(&task_watchdog))) {
-        rt_fprintf(stderr, "Impossible de delete la tache canari err : %s", strerror(-result));
+        rt_fprintf(stderr, "Impossible de delete la tache canari err : %s\n", strerror(-result));
         return -1;
     }
     return 0;
