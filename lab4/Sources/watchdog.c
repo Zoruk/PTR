@@ -2,15 +2,20 @@
 /**
 * \file watchdog.c
 * \brief Fonctions permettant la mise en place d'un watchdog.
-* \author Y. Thoma & D. Molla
-* \version 0.1
-* \date 29 septembre 2010
+* \author Y. Thoma, D. Molla, L. Haas
+* \version 0.2
+* \date 01 septembre 2015
 *
 * Le watchdog proposé est implémenté à l'aide de 2 tâches responsables
 * de détecter une surcharge du processeur. Si tel est le cas, une fonction
 * fournie par le développeur est appelée. Elle devrait suspendre ou détruire
 * les tâches courantes, afin de redonner la main à l'OS.
 *
+* L'implementation est faites de la manière suivante :
+*     - Une tache canari de priorité très faible incremante une variable global tout les temps CANARY
+*     - Une tache watchdog de priorité maximale péridique executée avec un temps > CANARY vérifie que 
+*           la variable global incremanté par la tache ci-dessus ai changée si elle est identiique appel
+*           la fonction passée par le dévloppeur affin d'arreter les tache provoquant une surcharge CPU.
 */
 
 #include <rtdk.h>
@@ -36,7 +41,7 @@ static RT_TASK task_canari;
 static RT_TASK task_watchdog;
 
 /** \brief Tache du canary
-* 
+*      Tache du canary incremante une variable global tout les temps fix 
 */
 static void task_canari_fct(void *data) {
     RTIME time = CANARI_PERIOD;
@@ -51,7 +56,8 @@ static void task_canari_fct(void *data) {
 }
 
 /**
-*
+*  Tache watchdog effectue la varification que le canary sois bien incremanté 
+*    affin de tetecter une éventuelle surcharge
 */
 static void task_watchdog_fct(void *data) {
     RTIME max_freez = WATCHDOG_PERIOD;
@@ -61,12 +67,18 @@ static void task_watchdog_fct(void *data) {
 
     // Vérifie que le canari dit cui cui suffisament souvant
     while (0 == rt_task_wait_period(NULL) && stop_watchdog == 0) {
+        // Affiche l'iteration du watchdog pour du débug
         rt_printf("Watchdod: check canarycpt = %u, last = %u\n", canari_cpt, last_canari_cpt);
         if (last_canari_cpt == canari_cpt) {
-            rt_printf("Watchdog : Arret du programme\n");
+            rt_printf("Watchdog : Surcharge détectée appel de la fonction d'arret\n");
             if (watchdog_suspend_function) 
                 watchdog_suspend_function();
-            //stop_watchdog = 1;
+            else {
+                // What to do here ? Maybe call exit(-1) ?
+                // Depend on implementation
+                // exit(-1);
+            }
+            //stop_watchdog = 1; // On pourrais aussi arreter le watchdog
         }
         last_canari_cpt = canari_cpt;
     }
@@ -86,12 +98,14 @@ int start_watchdog(void(* suspend_func)(void))
     watchdog_suspend_function=suspend_func;
     stop_watchdog = 0;
     int error;
-    
+ 
+    // Start canary task prioriry 0   
     if ((error = rt_task_spawn(&task_canari, "Canari task", 0, 0, 0, task_canari_fct, NULL)) != 0) {
         rt_printf("error: cannot create the canari task (%s)\n", strerror(-error));
         return -1;
     }
 
+    // Start watchdog task priority 99
     if ((error = rt_task_spawn(&task_watchdog, "Watchdog task", 0, 99, 0, task_watchdog_fct, NULL)) != 0) {
         rt_printf("error: cannot create the watchdog task (%s)\n", strerror(-error));
         return -1;
